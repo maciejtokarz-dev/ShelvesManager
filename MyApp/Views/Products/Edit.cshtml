@@ -1,0 +1,51 @@
+﻿@model MyApp.Models.Product
+
+@{
+    ViewData["Title"] = "Edytuj Produkt";
+}
+
+<div class="container mt-4">
+    <h2>Edytuj Produkt</h2>
+
+    <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">Nazwa produktu *</label>
+            <input asp-for="Name" class="form-control" required />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">Opis</label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Price" class="form-label">Cena *</label>
+            <input asp-for="Price" class="form-control" type="number" step="0.01" required />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ShelfId" class="form-label">Regał *</label>
+            <select asp-for="ShelfId" asp-items="ViewBag.Shelves" class="form-select" required>
+            </select>
+            <span asp-validation-for="ShelfId" class="text-danger"></span>
+            <small class="form-text text-muted">Możesz zmienić regał, aby przenieść produkt</small>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+            <a asp-controller="Shelves" asp-action="Index" class="btn btn-secondary">Anuluj</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

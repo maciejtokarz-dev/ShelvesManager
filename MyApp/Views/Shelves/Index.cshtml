@@ -1,0 +1,95 @@
+﻿@model List<MyApp.Models.Shelf>
+
+@{
+    ViewData["Title"] = "Moje Regały";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Moje Regały</h2>
+        <a asp-action="Create">Dodaj Regał</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <h4>Nie masz jeszcze żadnych regałów</h4>
+            <p>Utwórz pierwszy regał, aby zacząć organizować swoje produkty!</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var shelf in Model)
+        {
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link text-decoration-none" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#shelf-@shelf.Id">
+                                @shelf.Name (@shelf.Products.Count produktów)
+                        </button>
+                    </h5>
+                    <form asp-action="Delete" asp-route-id="@shelf.Id" method="post"
+                          onsubmit="return confirm('Czy na pewno usunąć regał i wszystkie produkty (@shelf.Products.Count)?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
+                    </form>
+                </div>
+
+                <div id="shelf-@shelf.Id" class="collapse">
+                    <div class="card-body">
+                        @if (!shelf.Products.Any())
+                        {
+                            <p class="text-muted">Brak produktów w tym regale.</p>
+                            <a asp-controller="Products" asp-action="Create" asp-route-shelfId="@shelf.Id"
+                               >Dodaj pierwszy produkt</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Products" asp-action="Create" asp-route-shelfId="@shelf.Id"
+                               class=" mb-3">Dodaj produkt</a>
+
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nazwa</th>
+                                        <th>Cena</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in shelf.Products)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <button class="btn btn-link text-start p-0" type="button"
+                                                        data-bs-toggle="collapse" data-bs-target="#desc-@product.Id">
+                                                    <strong>@product.Name</strong>
+                                                    <small class="text-muted">▼</small>
+                                                </button>
+                                                <div class="collapse mt-2" id="desc-@product.Id">
+                                                    <div mb-0">
+                                                        <strong>Opis:</strong><br />
+                                                        @(string.IsNullOrEmpty(product.Description) ? "Brak opisu" : product.Description)
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>@product.Price.ToString("C")</td>
+                                            <td>
+                                                <a asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id"
+                                                   >Edit</a>
+                                                <a asp-controller="Products" asp-action="Delete" asp-route-id="@product.Id"
+                                                   >Delete</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
